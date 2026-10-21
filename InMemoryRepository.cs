@@ -4,7 +4,7 @@ Họ tên: Trần Thị Hà Lan
 ********************************/
 
 using System;
-namespace TeachingDeviceManagement;
+namespace TeachingDeviceManagement
 {
     public class InMemoryRepository<T> : IRepository<T> where T : class, IIdentifiable
     {

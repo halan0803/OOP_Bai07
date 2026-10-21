@@ -5,7 +5,7 @@ Họ tên: Trần Thị Hà Lan
 
 using System;
 
-namespace TeachingDeviceManagement;
+namespace TeachingDeviceManagement
 {
     public interface IIdentifiable
     {
