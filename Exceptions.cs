@@ -31,7 +31,7 @@ namespace TeachingDeviceManagement
         public DeviceStatus CurrentStatus { get; }
 
         public DeviceNotReadyException(string deviceId, DeviceStatus currentStatus)
-            : base($"Thiết bị '{deviceId}' chưa sẵn sàng để cấp phát. Trạng thái: {currentStatus}.")
+            : base($"Thiết bị '{deviceId}' không đáp ứng điều kiện sẵn sàng (trạng thái hiện tại: {currentStatus}).")
         {
             DeviceId = deviceId;
             CurrentStatus = currentStatus;

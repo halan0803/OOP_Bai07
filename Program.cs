@@ -98,12 +98,30 @@ namespace TeachingDeviceManagement
 
             // 8. Đổi chiến lược trong thời gian chạy
             Console.WriteLine("8. Đổi chiến lược trong thời gian chạy");
-            var projectorFirstStrategy = new FirstAvailableStrategy<ProjectorRemote>();
-            projectorService.ChangeStrategy(projectorFirstStrategy);
-            var nextProjector = projectorService.Allocate();
-            Console.WriteLine($"=> Chiến lược mới chọn: {nextProjector.Id}");
-            nextProjector.Return();
-            Console.WriteLine("=> Đã đổi chiến lược và kiểm tra kết quả.\n");
+
+            // Repo riêng để không bị ảnh hưởng bởi trạng thái Borrowed ở các bước trước
+            var demoRepo = new InMemoryRepository<ProjectorRemote>();
+            demoRepo.Add(new ProjectorRemote("D01", "ĐK Demo 1", "Tủ 1", 30)); // đứng đầu, pin thấp nhưng sẵn sàng
+            demoRepo.Add(new ProjectorRemote("D02", "ĐK Demo 2", "Tủ 1", 90)); // pin cao nhất
+            demoRepo.Add(new ProjectorRemote("D03", "ĐK Demo 3", "Tủ 1", 60));
+
+            var demoService = new AllocationService<ProjectorRemote>(
+                demoRepo,
+                new HighestPriorityStrategy<ProjectorRemote>(d => d.GetDefaultPriorityScore()));
+
+            var byPriority = demoService.Allocate();
+            Console.WriteLine($"=> Chiến lược HighestPriority chọn: {byPriority.Id}");
+            byPriority.Return(); // trả lại để lần chọn sau có cùng tập ứng viên
+
+            demoService.ChangeStrategy(new FirstAvailableStrategy<ProjectorRemote>());
+            var byFirst = demoService.Allocate();
+            Console.WriteLine($"=> Chiến lược FirstAvailable chọn:  {byFirst.Id}");
+            byFirst.Return();
+
+            if (byPriority.Id == "D02" && byFirst.Id == "D01")
+                Console.WriteLine("=> PASS: Đổi chiến lược lúc chạy cho kết quả khác nhau.\n");
+            else
+                Console.WriteLine("=> FAIL: Kết quả không như kỳ vọng.\n");
 
             // 9. Thử cấp phát khi không có ứng viên phù hợp
             Console.WriteLine("9. Thử cấp phát khi không có ứng viên phù hợp (Phòng C999)");
@@ -127,12 +145,20 @@ namespace TeachingDeviceManagement
 
             // 11. Chứng minh repository tổng quát có thể dùng cho ít nhất hai loại thiết bị mà không sao chép mã
             Console.WriteLine("11. Chứng minh tính tổng quát của Generic Repository");
-            Console.WriteLine($"=> Sử dụng cùng 1 file InMemoryRepository.cs nhưng quản lý được:");
-            Console.WriteLine($"   - {projectorRepo.GetAll().Count} đối tượng ProjectorRemote.");
-            Console.WriteLine($"   - {acRepo.GetAll().Count} đối tượng AirConditionerRemote.");
-            Console.WriteLine("=> KHÔNG CẦN VIẾT LẠI MÃ CHO TỪNG LOẠI THIẾT BỊ.\n");
+            Console.WriteLine("=> Một hàm PrintRepository<T> và một lớp InMemoryRepository<T> phục vụ cả ba kiểu:");
+            PrintRepository(projectorRepo);
+            PrintRepository(acRepo);
+            PrintRepository(micRepo);
+            Console.WriteLine();
 
             Console.WriteLine("=== HOÀN THÀNH KIỂM THỬ ===");
+        }
+
+        static void PrintRepository<T>(IRepository<T> repo) where T : class, IIdentifiable
+        {
+            Console.WriteLine($"   Repository<{typeof(T).Name}>: {repo.GetAll().Count} đối tượng");
+            foreach (T item in repo.GetAll())
+                Console.WriteLine($"     - {item}");
         }
     }
 }

@@ -5,6 +5,7 @@ Họ tên: Trần Thị Hà Lan
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 namespace TeachingDeviceManagement
 {
     public class AirConditionerRemote : TeachingDevice
@@ -26,7 +27,7 @@ namespace TeachingDeviceManagement
                     rooms.Add(room.Trim());
             }
 
-            CompatibleRooms = rooms;
+            CompatibleRooms = rooms.ToImmutableHashSet(StringComparer.OrdinalIgnoreCase);
         }
 
         public bool IsCompatibleWith(string roomId)
