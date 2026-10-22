@@ -4,6 +4,7 @@ Họ tên: Trần Thị Hà Lan
 ********************************/
 
 using System;
+using System.Collections.Generic;
 namespace TeachingDeviceManagement
 {
     public interface IRepository<T> where T : class, IIdentifiable

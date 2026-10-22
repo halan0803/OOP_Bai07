@@ -4,6 +4,8 @@ Họ tên: Trần Thị Hà Lan
 ********************************/
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 namespace TeachingDeviceManagement
 {
     public class InMemoryRepository<T> : IRepository<T> where T : class, IIdentifiable
